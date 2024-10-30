@@ -2,6 +2,7 @@
  * @Description:
  * @telegram: @tron_monitor3_bot
 -->
+<meta name="keywords" content="飞机, 机器人, Bot, DG, Baccarat, 赌博, 出款, 提现, 博彩, Tron, USDT">
 ## 声明
 <div align="center">
 【电报推荐】10000+ 优质Telegram群组推荐、频道和机器人，精心筛选，让您轻松玩转Telegram。
