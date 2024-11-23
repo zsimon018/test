@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRON 转账演示</title>
+</head>
+<body>
+    <h1>TRON 转账演示</h1>
+    <div id="tronlinkCheck" style="margin-bottom: 20px; color: red;">
+        检查 TronLink 插件中...
+    </div>
+
+    <div id="content" style="display: none;">
+        <div>
+            <h2>转账 TRX</h2>
+            <form id="trxForm">
+                <label for="trxReceiver">接收地址：</label>
+                <input type="text" id="trxReceiver" placeholder="接收地址" required><br><br>
+                <label for="trxAmount">转账金额 (TRX)：</label>
+                <input type="number" id="trxAmount" placeholder="金额" required><br><br>
+                <button type="submit">发送 TRX</button>
+            </form>
+        </div>
+
+        <div>
+            <h2>转账 TRC20</h2>
+            <form id="trc20Form">
+                <label for="trc20Receiver">接收地址：</label>
+                <input type="text" id="trc20Receiver" placeholder="接收地址" required><br><br>
+                <label for="trc20Contract">TRC20 合约地址：</label>
+                <input type="text" id="trc20Contract" placeholder="合约地址" required><br><br>
+                <label for="trc20Amount">转账金额：</label>
+                <input type="number" id="trc20Amount" placeholder="金额" required><br><br>
+                <button type="submit">发送 TRC20</button>
+            </form>
+        </div>
+
+        <div id="result" style="margin-top: 20px; color: green;"></div>
+        <div id="error" style="margin-top: 20px; color: red;"></div>
+    </div>
+
+    <script>
+        // 检查 TronLink 是否安装
+        document.addEventListener('DOMContentLoaded', () => {
+            const tronlinkCheck = document.getElementById('tronlinkCheck');
+            const content = document.getElementById('content');
+
+            if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
+                tronlinkCheck.style.display = 'none';
+                content.style.display = 'block';
+            } else {
+                tronlinkCheck.innerHTML = `
+                    未检测到 TronLink 插件。请
+                    <a href="https://www.tronlink.org/" target="_blank">点击这里安装 TronLink</a>
+                    ，安装后刷新页面。
+                `;
+            }
+        });
+
+        // 处理 TRX 转账
+        document.getElementById('trxForm')?.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const receiver = document.getElementById('trxReceiver').value;
+            const amount = document.getElementById('trxAmount').value;
+
+            try {
+                const sunAmount = window.tronWeb.toSun(amount);
+                const tx = await window.tronWeb.trx.sendTransaction(receiver, sunAmount);
+                document.getElementById('result').innerText = `TRX 转账成功，交易哈希: ${tx.txid}`;
+            } catch (error) {
+                document.getElementById('error').innerText = `TRX 转账失败: ${error.message}`;
+            }
+        });
+
+        // 处理 TRC20 转账
+        document.getElementById('trc20Form')?.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const receiver = document.getElementById('trc20Receiver').value;
+            const contractAddress = document.getElementById('trc20Contract').value;
+            const amount = document.getElementById('trc20Amount').value;
+
+            try {
+                const tokenAmount = amount * Math.pow(10, 6); // 假设代币精度为6
+                const contract = await window.tronWeb.contract().at(contractAddress);
+                const tx = await contract.transfer(receiver, tokenAmount).send();
+                document.getElementById('result').innerText = `TRC20 转账成功，交易哈希: ${tx}`;
+            } catch (error) {
+                document.getElementById('error').innerText = `TRC20 转账失败: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
